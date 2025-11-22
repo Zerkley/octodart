@@ -1,6 +1,6 @@
 import 'package:commander_ui/commander_ui.dart';
 
-Future<void> getUserSelection(Commander commander) async {
+Future<void> getMasonSelection(Commander commander) async {
   final value = await commander.select(
     'What is your name ?',
     onDisplay: (value) => value,

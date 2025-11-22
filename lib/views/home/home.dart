@@ -1,5 +1,6 @@
 import 'package:commander_ui/commander_ui.dart';
 import 'package:octodart/modules/config/domain/config.dart';
+import 'package:octodart/views/mason/mason.dart';
 
 Future<void> getUserSelection(Commander commander, AppConfig config) async {
   final value = await commander.select(
@@ -12,7 +13,7 @@ Future<void> getUserSelection(Commander commander, AppConfig config) async {
   switch (value) {
     case 'Mason':
       //move to the mason screen here
-      print('moving to mason');
+      getMasonSelection(commander);
       break;
     case 'Android Sign':
       //move to android sign screen
