@@ -10,6 +10,8 @@ environment:
 dependencies:
   path: ^1.9.0
   commander_ui: ^2.4.0
+  http: ^1.6.0
+  toml: ^0.17.0
 
 dev_dependencies:
   lints: ^6.0.0
