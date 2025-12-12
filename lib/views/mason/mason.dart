@@ -14,7 +14,7 @@ class MasonScreen extends TuiScreen {
   @override
   Future<ScreenAction> run() async {
     final gitRepo = GithubClientRepository();
-    final masonRepo = MasonRepository();
+    final masonRepo = MasonClientRepository();
 
     final bricksList = await showSpinner(
       message: 'Loading bricks...',

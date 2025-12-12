@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:octodart/modules/mason/data/mason_def_repository.dart';
 import 'package:path/path.dart' as path;
 
 /// Repository for handling Mason brick operations.
@@ -8,7 +9,7 @@ import 'package:path/path.dart' as path;
 /// 2. Adds the brick from the configured git repository
 /// 3. Generates the brick using mason make
 /// 4. Cleans up all Mason-related files and folders
-class MasonRepository {
+class MasonClientRepository implements MasonRepository {
   /// Generates a Mason brick and cleans up all Mason artifacts.
   ///
   /// [brickName] The name of the brick to generate
@@ -17,6 +18,7 @@ class MasonRepository {
   ///
   /// Returns true if successful, false otherwise.
   /// Throws [MasonException] if any step fails.
+  @override
   Future<bool> generateBrick({
     required String brickName,
     required String gitUrl,
