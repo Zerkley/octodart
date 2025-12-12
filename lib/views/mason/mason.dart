@@ -1,6 +1,7 @@
 import 'package:commander_ui/commander_ui.dart';
 import 'package:octodart/modules/config/domain/config.dart';
 import 'package:octodart/modules/github/github_repository.dart';
+import 'package:octodart/modules/mason/data/mason_repository.dart';
 import 'package:octodart/routing/custom_router.dart';
 import 'package:octodart/utils/spinner.dart';
 
@@ -13,6 +14,7 @@ class MasonScreen extends TuiScreen {
   @override
   Future<ScreenAction> run() async {
     final gitRepo = GithubClientRepository();
+    final masonRepo = MasonClientRepository();
 
     final bricksList = await showSpinner(
       message: 'Loading bricks...',
@@ -37,8 +39,20 @@ class MasonScreen extends TuiScreen {
         // POP: Go back to the previous screen
         return ScreenAction.pop();
       } else {
-        print(value);
-        // After selection, go back to previous screen
+        try {
+          await showSpinnerWithProgress(
+            initialMessage: 'Generating brick: $value...',
+            operation: (updateMessage) => masonRepo.generateBrick(
+              brickName: value,
+              gitUrl: config.github.bricksUrl,
+              onProgress: updateMessage,
+            ),
+          );
+          print('✅ Brick "$value" generated successfully!');
+        } catch (e) {
+          print('❌ Error generating brick: $e');
+        }
+        // After generation (success or failure), go back to previous screen
         return ScreenAction.pop();
       }
     } else {
