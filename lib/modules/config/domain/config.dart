@@ -37,4 +37,14 @@ class AppConfig {
   Map<String, dynamic> toMap() {
     return {'github': github.toMap()};
   }
+
+  /// Returns true if the config is the default or empty configuration.
+  bool get isDefault {
+    final isBricksUrlDefault =
+        github.bricksUrl.isEmpty ||
+        github.bricksUrl == 'https://github.com/default/bricks';
+    final isAuthTokenDefault =
+        github.authToken.isEmpty || github.authToken == 'none';
+    return isBricksUrlDefault && isAuthTokenDefault;
+  }
 }
