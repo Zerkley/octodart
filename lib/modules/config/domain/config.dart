@@ -10,6 +10,10 @@ class GitHubConfig {
       authToken: map['auth_token'] as String? ?? '',
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {'bricks_url': bricksUrl, 'auth_token': authToken};
+  }
 }
 
 class AppConfig {
@@ -28,5 +32,9 @@ class AppConfig {
         map['github'] as Map<String, dynamic>? ?? {},
       ),
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'github': github.toMap()};
   }
 }

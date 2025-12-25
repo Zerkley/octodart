@@ -32,6 +32,26 @@ String get configDir {
   return env['HOME'] ?? '.';
 }
 
+/// Creates the default configuration file at the specified path.
+/// Creates the directory structure if it doesn't exist.
+Future<void> _createDefaultConfigFile(String configPath) async {
+  // Create the directory structure if it doesn't exist
+  final configDir = Directory(p.dirname(configPath));
+  if (!configDir.existsSync()) {
+    await configDir.create(recursive: true);
+  }
+
+  // Convert defaultAppConfig to a Map
+  final Map<String, dynamic> configMap = defaultAppConfig.toMap();
+
+  // Create a TOML document from the Map
+  final TomlDocument document = TomlDocument.fromMap(configMap);
+
+  // Write the TOML content to the file
+  final File configFile = File(configPath);
+  await configFile.writeAsString(document.toString());
+}
+
 /// Reads the TOML configuration file from the cross-platform user config directory.
 Future<AppConfig> loadConfig() async {
   // Note: Return type is now AppConfig (non-nullable)
@@ -48,6 +68,12 @@ Future<AppConfig> loadConfig() async {
     // 2. Locate the File
     // Note: We use baseConfigPath directly, NOT Directory(baseConfigPath)
     final String configPath = p.join(baseConfigPath, appName, configFileName);
+
+    // 2.5. Create the config file with default values if it doesn't exist
+    final File configFile = File(configPath);
+    if (!configFile.existsSync()) {
+      await _createDefaultConfigFile(configPath);
+    }
 
     // 3. Read and Parse the TOML
     final TomlDocument document = await TomlDocument.load(configPath);
