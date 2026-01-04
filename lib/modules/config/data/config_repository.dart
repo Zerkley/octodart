@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'package:octodart/modules/config/domain/config.dart';
+import 'package:masoneer/modules/config/domain/config.dart';
 import 'package:path/path.dart' as p;
 import 'package:toml/toml.dart';
 
-/// App-specific name used for the config folder (e.g., ~/.config/octodart/)
-const String appName = 'octodart';
+/// App-specific name used for the config folder (e.g., ~/.config/masoneer/)
+const String appName = 'masoneer';
 
 /// The name of the TOML configuration file
 const String configFileName = 'config.toml';

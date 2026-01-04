@@ -1,6 +1,6 @@
 import 'package:commander_ui/commander_ui.dart';
-import 'package:octodart/modules/config/domain/config.dart';
-import 'package:octodart/routing/custom_router.dart';
+import 'package:masoneer/modules/config/domain/config.dart';
+import 'package:masoneer/routing/custom_router.dart';
 
 class AndroidSignScreen extends TuiScreen {
   final Commander commander;

@@ -1,4 +1,4 @@
-import 'package:octodart/utils/console_clear.dart';
+import 'package:masoneer/utils/console_clear.dart';
 
 abstract class TuiScreen {
   final String screenName;

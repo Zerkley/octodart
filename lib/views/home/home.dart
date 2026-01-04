@@ -1,8 +1,8 @@
 import 'package:commander_ui/commander_ui.dart';
-import 'package:octodart/modules/config/domain/config.dart';
-import 'package:octodart/routing/custom_router.dart';
-import 'package:octodart/views/mason/mason.dart';
-import 'package:octodart/views/android_sign/android_sign.dart';
+import 'package:masoneer/modules/config/domain/config.dart';
+import 'package:masoneer/routing/custom_router.dart';
+import 'package:masoneer/views/mason/mason.dart';
+import 'package:masoneer/views/android_sign/android_sign.dart';
 
 class HomeScreen extends TuiScreen {
   final Commander commander;

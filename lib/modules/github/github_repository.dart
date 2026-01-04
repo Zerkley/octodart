@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:core';
 import 'package:yaml/yaml.dart';
 
-import 'package:octodart/modules/github/github_def_repository.dart';
+import 'package:masoneer/modules/github/github_def_repository.dart';
 
 typedef RepoIdentifiers = ({String owner, String repo});
 

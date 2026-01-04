@@ -1,9 +1,9 @@
 import 'package:commander_ui/commander_ui.dart';
-import 'package:octodart/modules/config/domain/config.dart';
-import 'package:octodart/modules/github/github_repository.dart';
-import 'package:octodart/modules/mason/data/mason_repository.dart';
-import 'package:octodart/routing/custom_router.dart';
-import 'package:octodart/utils/spinner.dart';
+import 'package:masoneer/modules/config/domain/config.dart';
+import 'package:masoneer/modules/github/github_repository.dart';
+import 'package:masoneer/modules/mason/data/mason_repository.dart';
+import 'package:masoneer/routing/custom_router.dart';
+import 'package:masoneer/utils/spinner.dart';
 
 class MasonScreen extends TuiScreen {
   final Commander commander;
