@@ -48,7 +48,8 @@ Future<void> _createDefaultConfigFile(String configPath) async {
   const sampleConfig = '''
 [github]
 repos = [
-  { name = "Example", github_url = "https://github.com/default/bricks" },
+  { name = "Very Good Templates", github_url = "https://github.com/VeryGoodOpenSource/very_good_templates" },
+  # If the repo provided is private, an auth_token from a privileged account on that repo is required.
   # Add more repos here:
   # { name = "Work", github_url = "https://github.com/company/bricks", auth_token = "ghp_xxxxx" },
 ]
