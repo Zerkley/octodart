@@ -1,19 +1,22 @@
 import 'dart:io';
-import 'package:octodart/modules/config/domain/config.dart';
+import 'package:masoneer/modules/config/domain/config.dart';
 import 'package:path/path.dart' as p;
 import 'package:toml/toml.dart';
 
-/// App-specific name used for the config folder (e.g., ~/.config/octodart/)
-const String appName = 'octodart';
+/// App-specific name used for the config folder (e.g., ~/.config/masoneer/)
+const String appName = 'masoneer';
 
 /// The name of the TOML configuration file
 const String configFileName = 'config.toml';
 
+/// Default configuration with a working example repository.
 final AppConfig defaultAppConfig = AppConfig(
-  github: GitHubConfig(
-    bricksUrl: 'https://github.com/default/bricks',
-    authToken: 'none',
-  ),
+  repos: [
+    GitHubRepoConfig(
+      name: 'Very Good Templates',
+      githubUrl: 'https://github.com/VeryGoodOpenSource/very_good_templates',
+    ),
+  ],
 );
 
 String get configDir {
@@ -32,6 +35,31 @@ String get configDir {
   return env['HOME'] ?? '.';
 }
 
+/// Creates the default configuration file at the specified path.
+/// Creates the directory structure if it doesn't exist.
+Future<void> _createDefaultConfigFile(String configPath) async {
+  // Create the directory structure if it doesn't exist
+  final configDir = Directory(p.dirname(configPath));
+  if (!configDir.existsSync()) {
+    await configDir.create(recursive: true);
+  }
+
+  // Create a sample TOML content with the new format
+  const sampleConfig = '''
+[github]
+repos = [
+  { name = "Very Good Templates", github_url = "https://github.com/VeryGoodOpenSource/very_good_templates" },
+  # If the repo provided is private, an auth_token from a privileged account on that repo is required.
+  # Add more repos here:
+  # { name = "Work", github_url = "https://github.com/company/bricks", auth_token = "ghp_xxxxx" },
+]
+''';
+
+  // Write the TOML content to the file
+  final File configFile = File(configPath);
+  await configFile.writeAsString(sampleConfig);
+}
+
 /// Reads the TOML configuration file from the cross-platform user config directory.
 Future<AppConfig> loadConfig() async {
   // Note: Return type is now AppConfig (non-nullable)
@@ -48,6 +76,12 @@ Future<AppConfig> loadConfig() async {
     // 2. Locate the File
     // Note: We use baseConfigPath directly, NOT Directory(baseConfigPath)
     final String configPath = p.join(baseConfigPath, appName, configFileName);
+
+    // 2.5. Create the config file with default values if it doesn't exist
+    final File configFile = File(configPath);
+    if (!configFile.existsSync()) {
+      await _createDefaultConfigFile(configPath);
+    }
 
     // 3. Read and Parse the TOML
     final TomlDocument document = await TomlDocument.load(configPath);

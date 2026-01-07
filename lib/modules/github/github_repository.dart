@@ -1,11 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:core';
+import 'package:yaml/yaml.dart';
+
+import 'package:masoneer/modules/github/github_def_repository.dart';
 
 typedef RepoIdentifiers = ({String owner, String repo});
 
-class GithubClientRepository {
+class GithubClientRepository implements GithubRepository {
   GithubClientRepository();
 
   /// A record representing the owner and repository names extracted from a GitHub URL.
@@ -74,16 +76,13 @@ class GithubClientRepository {
     return (owner: parts[0], repo: parts[1]);
   }
 
-  Future<void> listRepoContents(
-    String owner,
-    String repo, {
-    String? token,
-  }) async {
+  @override
+  Future<List<String>> listRepoContents(String repo, {String? token}) async {
     // TODO: Use the urls from the config file
     final repoInfo = _parseGitHubURL(repo);
     if (repoInfo == null) {
       print('error parsing github url');
-      return;
+      return [];
     }
     final url = Uri.parse(
       'https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repo}/contents',
@@ -99,8 +98,6 @@ class GithubClientRepository {
             'Bearer $token', // For private repos or higher rate limits
     };
 
-    print('Fetching contents from: $url');
-
     try {
       // 3. Make the GET Request
       final response = await http.get(url, headers: headers);
@@ -109,22 +106,70 @@ class GithubClientRepository {
         // 4. Parse the JSON Response
         final List<dynamic> contents = json.decode(response.body);
 
-        print('\n--- Repository Contents ($owner/$repo) ---');
-        for (final item in contents) {
-          final String name = item['name'] ?? 'N/A';
-          final String type = item['type'] ?? 'N/A'; // 'file' or 'dir'
+        // 1. Find the 'mason.yaml' file object
+        final masonYamlItem = contents.firstWhere(
+          (item) => item['name'] == 'mason.yaml' && item['type'] == 'file',
+          orElse: () => null, // Returns null if not found
+        );
 
-          // Display path, type, and size (if it's a file)
-          if (type == 'file') {
-            final int size = item['size'] ?? 0;
-            print('📄 FILE: $name (${size} bytes)');
-          } else if (type == 'dir') {
-            print('📁 DIRECTORY: $name');
+        if (masonYamlItem != null) {
+          final String? downloadUrl = masonYamlItem['download_url'];
+
+          if (downloadUrl != null) {
+            // 2. Fetch the raw content from the download URL
+            final http.Response response = await http.get(
+              Uri.parse(downloadUrl),
+            );
+
+            if (response.statusCode == 200) {
+              final String yamlContent = response.body;
+
+              // 3. Format/Parse the YAML content for use in Dart
+              try {
+                // Use loadYaml to parse the string into a Dart object (YamlMap)
+                final YamlMap yamlMap = loadYaml(yamlContent) as YamlMap;
+
+                // Convert the YamlMap to a standard Dart Map<String, dynamic>
+                // for easier use in the rest of your Dart application.
+                final Map<String, dynamic> dartMap = json.decode(
+                  json.encode(yamlMap),
+                );
+
+                if (dartMap.containsKey('bricks') && dartMap['bricks'] is Map) {
+                  // Cast the 'bricks' value to a Map<String, dynamic>
+                  final Map<String, dynamic> bricksMap =
+                      dartMap['bricks'] as Map<String, dynamic>;
+
+                  // Get the keys (the brick names) and convert them to a list
+                  final List<String> brickNamesList = bricksMap.keys.toList();
+
+                  return brickNamesList;
+                } else {
+                  print(
+                    '❌ Error: The parsed map does not contain the expected "bricks" map.',
+                  );
+                  return [];
+                }
+              } catch (e) {
+                print('❌ Error parsing YAML: $e');
+                return [];
+              }
+            } else {
+              print(
+                '❌ Failed to download mason.yaml. Status code: ${response.statusCode}',
+              );
+              return [];
+            }
           } else {
-            print('❓ OTHER: $name ($type)');
+            print('❌ mason.yaml item did not contain a download_url.');
+            return [];
           }
+        } else {
+          print(
+            '❌ The file mason.yaml was not found in the repository contents.',
+          );
+          return [];
         }
-        print('-----------------------------------------');
       } else {
         print('Error: Failed to fetch repository contents.');
         print('Status Code: ${response.statusCode}');
@@ -134,9 +179,11 @@ class GithubClientRepository {
         if (response.statusCode == 403) {
           print('Rate limit exceeded or token permissions insufficient.');
         }
+        return [];
       }
     } catch (e) {
       print('An exception occurred during the API call: $e');
+      return [];
     }
   }
 }
