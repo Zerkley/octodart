@@ -9,11 +9,14 @@ const String appName = 'masoneer';
 /// The name of the TOML configuration file
 const String configFileName = 'config.toml';
 
+/// Default configuration with an example repository structure.
 final AppConfig defaultAppConfig = AppConfig(
-  github: GitHubConfig(
-    bricksUrl: 'https://github.com/default/bricks',
-    authToken: 'none',
-  ),
+  repos: [
+    GitHubRepoConfig(
+      name: 'Example',
+      githubUrl: 'https://github.com/default/bricks',
+    ),
+  ],
 );
 
 String get configDir {
@@ -41,15 +44,19 @@ Future<void> _createDefaultConfigFile(String configPath) async {
     await configDir.create(recursive: true);
   }
 
-  // Convert defaultAppConfig to a Map
-  final Map<String, dynamic> configMap = defaultAppConfig.toMap();
-
-  // Create a TOML document from the Map
-  final TomlDocument document = TomlDocument.fromMap(configMap);
+  // Create a sample TOML content with the new format
+  const sampleConfig = '''
+[github]
+repos = [
+  { name = "Example", github_url = "https://github.com/default/bricks" },
+  # Add more repos here:
+  # { name = "Work", github_url = "https://github.com/company/bricks", auth_token = "ghp_xxxxx" },
+]
+''';
 
   // Write the TOML content to the file
   final File configFile = File(configPath);
-  await configFile.writeAsString(document.toString());
+  await configFile.writeAsString(sampleConfig);
 }
 
 /// Reads the TOML configuration file from the cross-platform user config directory.

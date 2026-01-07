@@ -1,7 +1,7 @@
 import 'package:commander_ui/commander_ui.dart';
 import 'package:masoneer/modules/config/domain/config.dart';
 import 'package:masoneer/routing/custom_router.dart';
-import 'package:masoneer/views/mason/mason.dart';
+import 'package:masoneer/views/mason/repo_selector.dart';
 import 'package:masoneer/views/android_sign/android_sign.dart';
 
 class HomeScreen extends TuiScreen {
@@ -33,8 +33,8 @@ class HomeScreen extends TuiScreen {
           // Stay on the current screen (run again)
           return ScreenAction.push(this);
         }
-        // PUSH: Go to the Mason screen and keep HomeScreen on the stack
-        return ScreenAction.push(MasonScreen(commander, config));
+        // PUSH: Go to the Repo Selector screen
+        return ScreenAction.push(RepoSelectorScreen(commander, config.repos));
       case 'Mason (Not configured in config file)':
         // Block access if mason is not configured
         print(

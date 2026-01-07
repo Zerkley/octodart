@@ -7,9 +7,9 @@ import 'package:masoneer/utils/spinner.dart';
 
 class MasonScreen extends TuiScreen {
   final Commander commander;
-  final AppConfig config;
+  final GitHubRepoConfig repoConfig;
 
-  MasonScreen(this.commander, this.config) : super('Mason');
+  MasonScreen(this.commander, this.repoConfig) : super('Mason');
 
   @override
   Future<ScreenAction> run() async {
@@ -17,10 +17,10 @@ class MasonScreen extends TuiScreen {
     final masonRepo = MasonClientRepository();
 
     final bricksList = await showSpinner(
-      message: 'Loading bricks...',
+      message: 'Loading bricks from ${repoConfig.name}...',
       operation: () => gitRepo.listRepoContents(
-        config.github.bricksUrl,
-        token: config.github.authToken,
+        repoConfig.githubUrl,
+        token: repoConfig.authToken,
       ),
     );
 
@@ -44,7 +44,7 @@ class MasonScreen extends TuiScreen {
             initialMessage: 'Generating brick: $value...',
             operation: (updateMessage) => masonRepo.generateBrick(
               brickName: value,
-              gitUrl: config.github.bricksUrl,
+              gitUrl: repoConfig.githubUrl,
               onProgress: updateMessage,
             ),
           );
@@ -56,7 +56,7 @@ class MasonScreen extends TuiScreen {
         return ScreenAction.pop();
       }
     } else {
-      print('No bricks found.');
+      print('No bricks found in ${repoConfig.name}.');
       // Show a menu with just Back option if no bricks found
       final value = await commander.select(
         'No bricks available',
