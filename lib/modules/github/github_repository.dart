@@ -7,7 +7,10 @@ import 'package:masoneer/modules/github/github_def_repository.dart';
 
 typedef RepoIdentifiers = ({String owner, String repo});
 
+/// Implementation of [GithubRepository] that fetches Mason brick information
+/// from GitHub repositories via the GitHub API.
 class GithubClientRepository implements GithubRepository {
+  /// Creates a new [GithubClientRepository] instance.
   GithubClientRepository();
 
   /// A record representing the owner and repository names extracted from a GitHub URL.
