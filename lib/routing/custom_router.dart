@@ -15,12 +15,14 @@ abstract class TuiScreen {
 class ScreenAction {
   final String actionType;
   final TuiScreen? nextScreen;
+  final Future<void> Function()? onExit;
 
   ScreenAction.push(TuiScreen screen)
     : actionType = 'PUSH',
-      nextScreen = screen;
-  ScreenAction.pop() : actionType = 'POP', nextScreen = null;
-  ScreenAction.exit() : actionType = 'EXIT', nextScreen = null;
+      nextScreen = screen,
+      onExit = null;
+  ScreenAction.pop() : actionType = 'POP', nextScreen = null, onExit = null;
+  ScreenAction.exit([this.onExit]) : actionType = 'EXIT', nextScreen = null;
 }
 
 /// Main application router that manages the screen stack and navigation.
@@ -77,6 +79,10 @@ class TuiApp {
           // Application shutdown.
           clearScreen();
           isRunning = false;
+          // Run any post-exit callback (e.g., generateBrick outside TUI context)
+          if (action.onExit != null) {
+            await action.onExit!();
+          }
           break;
       }
     }

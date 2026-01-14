@@ -14,7 +14,6 @@ class MasonScreen extends TuiScreen {
   @override
   Future<ScreenAction> run() async {
     final gitRepo = GithubClientRepository();
-    final masonRepo = MasonClientRepository();
 
     final bricksList = await showSpinner(
       message: 'Loading bricks from ${repoConfig.name}...',
@@ -39,21 +38,20 @@ class MasonScreen extends TuiScreen {
         // POP: Go back to the previous screen
         return ScreenAction.pop();
       } else {
-        try {
-          await showSpinnerWithProgress(
-            initialMessage: 'Generating brick: $value...',
-            operation: (updateMessage) => masonRepo.generateBrick(
-              brickName: value,
-              gitUrl: repoConfig.githubUrl,
-              onProgress: updateMessage,
-            ),
-          );
-          print('✅ Brick "$value" generated successfully!');
-        } catch (e) {
-          print('❌ Error generating brick: $e');
-        }
-        // After generation (success or failure), go back to previous screen
-        return ScreenAction.pop();
+        // Exit TUI completely to free stdout for interactive prompts
+        // Run generateBrick after exiting the TUI context
+        final brickName = value;
+        final gitUrl = repoConfig.githubUrl;
+        return ScreenAction.exit(() async {
+          // Run generateBrick outside TUI context - stdout is now free
+          final masonRepo = MasonClientRepository();
+          try {
+            await masonRepo.generateBrick(brickName: brickName, gitUrl: gitUrl);
+            print('✅ Brick "$brickName" generated successfully!');
+          } catch (e) {
+            print('❌ Error generating brick: $e');
+          }
+        });
       }
     } else {
       print('No bricks found in ${repoConfig.name}.');
